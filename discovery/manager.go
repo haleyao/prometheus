@@ -387,7 +387,11 @@ func (m *Manager) updateGroup(poolKey poolKey, tgs []*targetgroup.Group) {
 	}
 	for _, tg := range tgs {
 		if tg != nil { // Some Discoverers send nil target group so need to check for it to avoid panics.
-			m.targets[poolKey][tg.Source] = tg
+			if len(tg.Targets) == 0 && len(tg.Labels) == 0 && tg.Source != "" {
+				delete(m.targets[poolKey], tg.Source)
+			} else {
+				m.targets[poolKey][tg.Source] = tg
+			}
 		}
 	}
 }
